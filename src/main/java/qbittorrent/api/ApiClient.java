@@ -67,7 +67,7 @@ public class ApiClient {
             final HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             final String body = response.body();
             final int status = response.statusCode();
-            if (status != 200) {
+            if (status < 200 || status >= 300) {
                 LOGGER.warn("Login Error: {}", body);
                 throw new ApiException("Could not log in: (" + status + ") " + body);
             }
@@ -80,7 +80,8 @@ public class ApiClient {
             }
 
             final String setCookieValue = setCookie.get();
-            if (!setCookieValue.contains("SID=")) {
+            if (!setCookieValue.contains("SID=") &&
+                !setCookieValue.contains("QBT_SID")) {
                 throw new ApiException("Could not get auth cookie from qBittorrent");
             }
 
